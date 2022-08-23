@@ -12,7 +12,7 @@ public interface UserRepository extends CrudRepository<User, String> {
 
     //select * from user u where u.username = :username
     //@Query("select u from User u where u.username = :un")
-    Optional<User> findByUsername(@Param("un") String username);
+    Optional<User> findByUsername(String username);
 
     // select count(*) from user u where u.username = :username
     boolean existsByUsername(String username);

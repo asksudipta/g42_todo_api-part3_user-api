@@ -9,7 +9,7 @@ public interface UserService {
 
     UserDto findByUsername(String username) throws ObjectNotFoundException;
 
-    void disableUserByUsername(String username);
+    void disableUserByUsername(String username) throws ObjectNotFoundException;
 
-    void enableUserByUsername(String username);
+    void enableUserByUsername(String username) throws ObjectNotFoundException;
 }
