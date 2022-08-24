@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import se.lexicon.todoapi.exception.ObjectNotFoundException;
+import se.lexicon.todoapi.model.dto.CustomUserDto;
 import se.lexicon.todoapi.model.dto.RoleDto;
 import se.lexicon.todoapi.model.dto.UserDto;
 import se.lexicon.todoapi.model.entity.User;
@@ -44,23 +45,23 @@ public class UserController {
 
 
     @GetMapping("/{username}")
-    public ResponseEntity<UserDto> findByUsername(@PathVariable("username") String username) throws ObjectNotFoundException {
+    public ResponseEntity<CustomUserDto> findByUsername(@PathVariable("username") String username) throws ObjectNotFoundException {
         System.out.println("Username =" + username);
-        UserDto userDto = userService.findByUsername(username);
-        return ok(userDto);
+        CustomUserDto userDto = userService.findByUsername(username);
+        return ResponseEntity.ok(userDto);
 
     }
 
     @PutMapping("/disable")
     public ResponseEntity<Void> disableUser(@RequestParam("username") String username) throws ObjectNotFoundException {
         userService.disableUserByUsername(username);
-        return null;
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/enable")
     public ResponseEntity<Void> enableUser(@RequestParam("username") String username) throws ObjectNotFoundException {
         userService.enableUserByUsername(username);
-        return null;
+        return ResponseEntity.noContent().build();
     }
 
 }

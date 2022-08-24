@@ -4,9 +4,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import se.lexicon.todoapi.exception.ObjectNotFoundException;
+import se.lexicon.todoapi.model.dto.CustomUserDto;
 import se.lexicon.todoapi.model.dto.RoleDto;
 import se.lexicon.todoapi.model.dto.UserDto;
-import se.lexicon.todoapi.model.entity.Role;
 import se.lexicon.todoapi.model.entity.User;
 import se.lexicon.todoapi.repository.RoleRepository;
 import se.lexicon.todoapi.repository.UserRepository;
@@ -34,9 +34,10 @@ public class UserServiceImpl implements UserService {
         if (dto.getUsername() == null) throw new IllegalArgumentException("Username was null");
         if (dto.getPassword() == null) throw new IllegalArgumentException("Password was null");
         if (dto.isExpired()) throw new IllegalArgumentException("Expired value must be false or null");
-        if (dto.getRoles() == null || dto.getRoles().size() == 0)
+       /* if (dto.getRoles() == null || dto.getRoles().size() == 0)
             throw new IllegalArgumentException("Role list was null");
-        // check the user name is duplicate or no
+        check the user name is duplicate or no
+        */
         if (userRepository.existsByUsername(dto.getUsername()))
             throw new IllegalArgumentException("Username was duplicate");
         // check the roles are valid or not
@@ -54,43 +55,37 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto findByUsername(String username) throws ObjectNotFoundException {
-        if(username== null)throw new IllegalArgumentException("User name has null value");
+    public CustomUserDto findByUsername(String username) throws ObjectNotFoundException {
+        // check the method params
+        if (username == null) throw new IllegalArgumentException("Username was null");
 
-        User result = userRepository.findByUsername(username).orElseThrow(
-                () -> new ObjectNotFoundException("Role data not found"));
-
-        return modelMapper.map(result, UserDto.class);
-
+        // reuse findByUsername method of userRepository
+        User foundUser = userRepository.findByUsername(username).orElseThrow(() -> new ObjectNotFoundException("User data not found"));
+        // convert entity to dto
+        CustomUserDto convertedToDto = modelMapper.map(foundUser, CustomUserDto.class);
+        // return the result
+        return convertedToDto;
 
     }
-
     @Override
     public void disableUserByUsername(String username) throws ObjectNotFoundException {
-        if(username== null)throw new IllegalArgumentException("User Name has null value");
-
-
-        User result = userRepository.findByUsername(username).orElseThrow(
-                () -> new ObjectNotFoundException("Role data not found"));
-
-        userRepository.updateExpiredByUsername(username,true);
-
-
-
+        //Calling the updateUserExpired method here with the status
+        updateUserExpired(username, true);
     }
-
     @Override
     public void enableUserByUsername(String username) throws ObjectNotFoundException {
-        if(username== null)throw new IllegalArgumentException("User Name has null value");
-
-
-        User result = userRepository.findByUsername(username).orElseThrow(
-                () -> new ObjectNotFoundException("Role data not found"));
-
-        userRepository.updateExpiredByUsername(username,false);
-
-
+        //Calling the updateUserExpired method here with the status
+        updateUserExpired(username, false);
     }
 
+    //Creating this method as the above method has the same method body .
+    private void updateUserExpired(String username, boolean status) throws ObjectNotFoundException {
+        // check the method params
+        if (username == null) throw new IllegalArgumentException("Username was null");
 
+        // check username exist or no
+        boolean isExist = userRepository.existsByUsername(username);
+        if(!isExist) throw new ObjectNotFoundException("User data not found");
+        userRepository.updateExpiredByUsername(username, status);
+    }
 }
